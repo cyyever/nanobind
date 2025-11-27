@@ -16,13 +16,12 @@ NAMESPACE_BEGIN(NB_NAMESPACE)
 NAMESPACE_BEGIN(detail)
 
 // Protected by internals->mutex in free-threaded builds
-Buffer buf(128);
+static Buffer buf(128);
 
 NAMESPACE_END(detail)
 
 #if PY_VERSION_HEX >= 0x030C0000
-python_error::python_error() {
-    m_value = PyErr_GetRaisedException();
+python_error::python_error() : m_value(PyErr_GetRaisedException()) {
     check(m_value,
           "nanobind::python_error::python_error(): error indicator unset!");
 }
@@ -213,7 +212,7 @@ const char *python_error::what() const noexcept {
 
 builtin_exception::builtin_exception(exception_type type, const char *what)
     : std::runtime_error(what ? what : ""), m_type(type) { }
-builtin_exception::~builtin_exception() { }
+builtin_exception::~builtin_exception() = default;
 
 NAMESPACE_BEGIN(detail)
 

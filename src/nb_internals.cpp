@@ -138,7 +138,7 @@ static PyType_Spec nb_bound_method_spec = {
     /* .slots = */ nb_bound_method_slots
 };
 
-void default_exception_translator(const std::exception_ptr &p, void *) {
+static void default_exception_translator(const std::exception_ptr &p, void * /*unused*/) {
     try {
         std::rethrow_exception(p);
     } catch (const std::bad_alloc &e) {
@@ -284,7 +284,7 @@ static void internals_cleanup() {
 
         int ctr = 0;
         for (size_t i = 0; i < p->shard_count && ctr < 20; ++i) {
-            for (auto [k, v]: p->shards[i].inst_c2p) {
+            for (const auto& [k, v]: p->shards[i].inst_c2p) {
                 if (NB_UNLIKELY(nb_is_seq(v))) {
                     nb_inst_seq* seq = nb_get_seq(v);
                     for(; seq != nullptr && ctr < 20; seq = seq->next) {
@@ -337,7 +337,7 @@ static void internals_cleanup() {
             fprintf(stderr, "nanobind: leaked %zu functions!\n",
                     p->funcs.size());
             int ctr = 0;
-            for (auto [f, p2] : p->funcs) {
+            for (const auto& [f, p2] : p->funcs) {
                 fprintf(stderr, " - leaked function \"%s\"\n",
                         nb_func_data(f)->name);
                 INC_CTR;
